@@ -1,0 +1,45 @@
+meta {
+  name: Restaurant Options
+  type: http
+  seq: 4
+}
+
+get {
+  url: https://api.yelp.com/v3/businesses/search?location=Austin, Texas 78702&sort_by=distance&reservation_date=2025-02-22&reservation_covers=2&matches_party_size_param=false&limit=5&reservation_time=21:00&term=restaurants&price=4
+  body: none
+  auth: bearer
+}
+
+params:query {
+  location: Austin, Texas 78702
+  sort_by: distance
+  reservation_date: 2025-02-22
+  reservation_covers: 2
+  matches_party_size_param: false
+  limit: 5
+  reservation_time: 21:00
+  term: restaurants
+  price: 4
+}
+
+headers {
+  accept: application/json
+}
+
+auth:bearer {
+  token: {{yelpAPIkey}}
+}
+
+tests {
+  // Parse the JSON response from Yelp
+  const responseData = res.getBody();
+  const businesses = responseData.businesses;
+  
+  for (let i = 0; i < 5; i++) {
+    const url = (businesses[i] && businesses[i].url) ? businesses[i].url : "";
+    bru.setEnvVar("restaurantUrl" + (i + 1), url);
+  }
+  
+  
+  
+}

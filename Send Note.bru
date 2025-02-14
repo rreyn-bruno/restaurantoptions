@@ -1,0 +1,54 @@
+meta {
+  name: Send Note
+  type: http
+  seq: 5
+}
+
+post {
+  url: https://api.us.nylas.com/v3/grants/:grant_id/messages/send
+  body: json
+  auth: bearer
+}
+
+params:path {
+  grant_id: {{grantid}}
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{nylasAPIkey}}
+}
+
+body:json {
+  {
+    "subject": "Options for our date",
+    "body": "Hi Love, Here are our restaurant options for next Saturday: {{formattedRestaurantUrls}} Let me know which one you prefer
+    "to": [
+      {
+        "name": "John Doe",
+        "email": "reynolds.ryan.andrew@gmail.com"
+      }
+    ]
+  }
+}
+
+script:pre-request {
+  // Retrieve the JSON string stored earlier
+  const urlsJSON = bru.getEnvVar("restaurantUrls");
+  
+  // Parse the JSON string to get back the array of URLs
+  const urlsArray = JSON.parse(urlsJSON);
+  
+  // Join the URLs with a newline separator
+  const formattedUrls = urlsArray.join("\n");
+  
+  // Store this formatted string in a new variable
+  bru.setEnvVar("formattedRestaurantUrls", formattedUrls);
+  
+  // Log for debugging
+  console.log("Formatted restaurant URLs:", formattedUrls);
+}
